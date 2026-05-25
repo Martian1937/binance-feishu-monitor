@@ -1,19 +1,19 @@
 # binance-feishu-monitor
 
-监控 Binance 永续合约 K 线价格波动，通过飞书机器人发送告警。
+监控 Binance U 本位永续合约 K 线，捕捉瞬间拉升 + 趋势上涨 + 成交量异常，通过飞书机器人推送告警。
 
 ## 功能
 
-- 实时监控多个币种 15 分钟 K 线
-- 价格从 K 线最高点下跌 / 从最低点上涨超过阈值时触发告警
-- 同方向告警有冷却时间，避免刷屏
-- 飞书卡片消息推送
+- **1 分钟 K 线**，30 秒轮询，快速发现异动
+- **三维告警**：单 K 线拉升 / 多 K 线趋势 / 成交量放大
+- **同方向冷却**，避免刷屏
+- **飞书卡片消息**，不同颜色区分告警类型
 
 ## 使用
 
 ```bash
 pip install requests
-python3 main.py
+LARK_WEBHOOK="https://..." python3 main.py
 ```
 
 ## 配置
@@ -23,9 +23,14 @@ python3 main.py
 | 变量 | 说明 | 默认值 |
 |---|---|---|
 | `SYMBOLS` | 监控币种列表 (小写+usdt) | `["vvvusdt", "labusdt", ...]` |
-| `THRESHOLD` | 涨跌幅告警阈值 | 0.03 (3%) |
-| `CHECK_INTERVAL` | 轮询间隔 (秒) | 300 |
-| `ALERT_COOLDOWN` | 同方向告警冷却 (秒) | 1800 |
+| `INTERVAL` | K 线周期 | `1m` |
+| `THRESHOLD` | 单 K 线拉升阈值 | 0.02 (2%) |
+| `CHECK_INTERVAL` | 轮询间隔 (秒) | 30 |
+| `ALERT_COOLDOWN` | 同方向告警冷却 (秒) | 120 |
+| `TREND_KLINES` | 趋势判断 K 线数量 | 5 |
+| `TREND_THRESHOLD` | 趋势累计涨幅阈值 | 0.04 (4%) |
+| `VOLUME_WINDOW` | 成交量均值窗口 | 10 |
+| `VOLUME_MULTIPLIER` | 成交量放大倍数 | 2.0 |
 | `LARK_WEBHOOK` | 飞书机器人 Webhook | — |
 
 ## 项目结构
