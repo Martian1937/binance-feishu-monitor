@@ -37,10 +37,14 @@ LARK_WEBHOOK="https://..." python3 main.py
 
 ```
 binance-feishu-monitor/
-├── config.py    # 配置常量
-├── util.py      # 通用工具 (log)
-├── lark.py      # 飞书消息推送
-├── api.py       # Binance REST API
-├── monitor.py   # 价格检查与告警逻辑
-└── main.py      # 入口
+├── config.py       # 配置常量
+├── util.py         # 通用工具 (log)
+├── lark.py         # 飞书消息推送
+├── api.py          # Binance REST API
+├── monitor.py      # 调度引擎 (K线 + 多策略)
+├── main.py         # 入口
+└── strategies/     # 策略目录
+    ├── __init__.py # 策略注册
+    ├── base.py     # 基类
+    └── surge.py    # 放量拉升 + 放量下跌
 ```

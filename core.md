@@ -13,15 +13,35 @@ Binance Futures API (fapi)
           └─ 滑动窗口 (20根) ─── 每币种保留最近 K 线历史
 ```
 
-## 状态结构
+## 策略架构
+
+策略放在 `strategies/` 文件夹下，每个策略一个文件，继承 `BaseStrategy`。
+
+```
+strategies/
+├── __init__.py    # 注册所有策略
+├── base.py        # BaseStrategy 基类
+├── surge.py       # 📈 放量拉升 + 📉 放量下跌
+└── ...            # 后续策略加在这里
+```
+
+新增策略只需三步：
+1. 在 `strategies/` 下新建文件，继承 `BaseStrategy`
+2. 实现 `init_state()` 和 `check()` 方法
+3. 在 `__init__.py` 的 `STRATEGIES` 列表里注册
+
+### 状态结构
 
 每个币种维护：
 
 ```
 {
   "klines": [...],            # 最近 N 根 K 线（滑动窗口）
-  "last_rise_alert": 0,       # 上次上涨告警时间戳
-  "last_drop_alert": 0,       # 上次下跌告警时间戳
+  "surge": {                  # surge 策略的独立状态
+    "last_rise_alert": 0,
+    "last_drop_alert": 0,
+  },
+  # 新增策略的 state 会追加在这里
 }
 ```
 
@@ -32,7 +52,7 @@ Binance Futures API (fapi)
   - 相同 → 更新（K线未闭合，价格还在变）
   - 不同 → 追加新K线，超出长度则移除最老的
 
-## 双向检测
+## Surge 策略
 
 上涨和下跌各有一套独立的组合条件，独立冷却。
 
