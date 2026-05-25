@@ -19,7 +19,15 @@ def run():
 
     from monitor import init_states, timer_loop
 
+    from lark import send_lark
+
     init_states()
+    send_lark("🟢 监控已启动", [
+        f"**监控币种**\n{len(merged)} 个 (Top{TOP_N}涨幅 + 配置)",
+        f"**单K线拉升阈值**\n>{config.THRESHOLD*100:.0f}%",
+        f"**趋势阈值**\n>{config.TREND_THRESHOLD*100:.0f}%",
+        f"**检查间隔**\n{config.CHECK_INTERVAL}秒",
+    ], template="green")
     log("=" * 50)
     log(f"多币种永续合约价格监控启动 (API轮询): {len(merged)} 个币种 (Top{TOP_N}涨幅 + 配置)")
     log("=" * 50)
