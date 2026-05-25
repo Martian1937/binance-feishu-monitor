@@ -9,5 +9,6 @@ TREND_KLINES = 5
 TREND_THRESHOLD = 0.04
 VOLUME_WINDOW = 10
 VOLUME_MULTIPLIER = 2.0
+TOP_N = 50
 LARK_WEBHOOK = os.environ.get("LARK_WEBHOOK") or ""
 REST_URL = "https://fapi.binance.com/fapi/v1/klines"

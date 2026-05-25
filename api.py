@@ -38,3 +38,18 @@ def fetch_klines(sym, limit):
     except Exception as e:
         log(f"[{sym.upper()}] 批量K线请求失败: {e}")
         return None
+
+
+TICKER_URL = "https://fapi.binance.com/fapi/v1/ticker/24hr"
+
+
+def fetch_top_gainers(n):
+    try:
+        resp = requests.get(TICKER_URL, timeout=10)
+        data = resp.json()
+        usdt = [item for item in data if item["symbol"].endswith("USDT")]
+        usdt.sort(key=lambda x: float(x["priceChangePercent"]), reverse=True)
+        return [item["symbol"].lower() for item in usdt[:n]]
+    except Exception as e:
+        log(f"获取Top涨幅币种失败: {e}")
+        return []
