@@ -48,3 +48,5 @@ binance-feishu-monitor/
     ├── base.py     # 基类
     └── surge.py    # 放量拉升 + 放量下跌
 ```
+
+ source ~/.zshrc && nohup python3 main.py > py-script.log 2>&1 
