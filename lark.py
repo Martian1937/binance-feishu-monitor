@@ -3,7 +3,11 @@ from config import LARK_WEBHOOK
 from util import log
 
 
-def send_lark(title, content_lines, template="red"):
+def send_lark(title, content_lines, template="red", webhook=None):
+    url = webhook or LARK_WEBHOOK
+    if not url:
+        log("Lark webhook 未配置，跳过")
+        return False
     try:
         payload = {
             "msg_type": "interactive",
@@ -23,7 +27,7 @@ def send_lark(title, content_lines, template="red"):
                 ],
             },
         }
-        resp = requests.post(LARK_WEBHOOK, json=payload, timeout=10)
+        resp = requests.post(url, json=payload, timeout=10)
         result = resp.json()
         if result.get("code") == 0:
             log("Lark 消息发送成功")

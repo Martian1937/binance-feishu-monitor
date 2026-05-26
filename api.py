@@ -14,11 +14,13 @@ def _parse_kline(k):
     }
 
 
-def fetch_kline(sym):
+def fetch_kline(sym, interval=None):
+    if interval is None:
+        interval = INTERVAL
     try:
         resp = requests.get(REST_URL, params={
             "symbol": sym.upper(),
-            "interval": INTERVAL,
+            "interval": interval,
             "limit": 1,
         }, timeout=10)
         return _parse_kline(resp.json()[0])
@@ -27,11 +29,13 @@ def fetch_kline(sym):
         return None
 
 
-def fetch_klines(sym, limit):
+def fetch_klines(sym, limit, interval=None):
+    if interval is None:
+        interval = INTERVAL
     try:
         resp = requests.get(REST_URL, params={
             "symbol": sym.upper(),
-            "interval": INTERVAL,
+            "interval": interval,
             "limit": limit,
         }, timeout=10)
         return [_parse_kline(k) for k in resp.json()]
