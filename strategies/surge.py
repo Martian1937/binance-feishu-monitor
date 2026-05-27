@@ -22,7 +22,7 @@ class SurgeStrategy(BaseStrategy):
     cooldown = 300
 
     def init_state(self):
-        return {"last_rise_alert": 0, "last_drop_alert": 0}
+        return {"last_alert": 0}
 
     def check(self, sym, kline, klines, state, now):
         high_p = kline["high"]
@@ -46,10 +46,16 @@ class SurgeStrategy(BaseStrategy):
         if not rise_ok and not drop_ok:
             return None
 
+        if now - state["last_alert"] < self.cooldown:
+            return None
+        if kline["open_time"] == state.get("last_open_time"):
+            return None
+        state["last_alert"] = now
+        state["last_open_time"] = kline["open_time"]
+
         tag = sym.upper().replace("USDT", "")
 
-        if rise_ok and now - state["last_rise_alert"] >= self.cooldown:
-            state["last_rise_alert"] = now
+        if rise_ok:
             vol_ratio = vol / avg_vol
             return self.build_alert(
                 tag=tag,
@@ -67,23 +73,19 @@ class SurgeStrategy(BaseStrategy):
                 template="orange",
             )
 
-        if drop_ok and now - state["last_drop_alert"] >= self.cooldown:
-            state["last_drop_alert"] = now
-            vol_ratio = vol / avg_vol
-            return self.build_alert(
-                tag=tag,
-                title=f"{_fire(drop_pct)} {tag} 放量下跌 -{drop_pct*100:.2f}%",
-                fields=[
-                    f"**当前价格**\n{close_p:.6f} USDT",
-                    f"**K线最低**\n{low_p:.6f} USDT",
-                    f"**K线最高**\n{high_p:.6f} USDT",
-                    f"**下跌幅度**\n-{drop_pct*100:.2f}%",
-                    f"**成交量**\n{vol:.0f}（{vol_ratio:.1f}倍均值）",
-                    f"**连续阴线**\n{len(klines) - 2}根+（含本根）",
-                    f"**检测时间**\n{datetime.now().strftime('%H:%M:%S')}",
-                    f"**K线周期**\n15分钟",
-                ],
-                template="purple",
-            )
-
-        return None
+        vol_ratio = vol / avg_vol
+        return self.build_alert(
+            tag=tag,
+            title=f"{_fire(drop_pct)} {tag} 放量下跌 -{drop_pct*100:.2f}%",
+            fields=[
+                f"**当前价格**\n{close_p:.6f} USDT",
+                f"**K线最低**\n{low_p:.6f} USDT",
+                f"**K线最高**\n{high_p:.6f} USDT",
+                f"**下跌幅度**\n-{drop_pct*100:.2f}%",
+                f"**成交量**\n{vol:.0f}（{vol_ratio:.1f}倍均值）",
+                f"**连续阴线**\n{len(klines) - 2}根+（含本根）",
+                f"**检测时间**\n{datetime.now().strftime('%H:%M:%S')}",
+                f"**K线周期**\n15分钟",
+            ],
+            template="purple",
+        )
