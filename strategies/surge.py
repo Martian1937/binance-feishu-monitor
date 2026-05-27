@@ -4,6 +4,11 @@ from config import THRESHOLD, VOLUME_WINDOW, VOLUME_MULTIPLIER
 from .base import BaseStrategy
 
 
+def _fire(pct):
+    n = 1 if pct < 0.05 else 2 if pct <= 0.10 else 3
+    return "🔥" * n
+
+
 def _avg_volume(klines, n):
     closed = [k for k in klines if k["close"] != k["open"]]
     recent = closed[-n:] if n <= len(closed) else closed
@@ -48,7 +53,7 @@ class SurgeStrategy(BaseStrategy):
             vol_ratio = vol / avg_vol
             return self.build_alert(
                 tag=tag,
-                title=f"🔥 {tag} 放量拉升 +{rise_pct*100:.2f}%",
+                title=f"{_fire(rise_pct)} {tag} 放量拉升 +{rise_pct*100:.2f}%",
                 fields=[
                     f"**当前价格**\n{close_p:.6f} USDT",
                     f"**K线最低**\n{low_p:.6f} USDT",
@@ -67,7 +72,7 @@ class SurgeStrategy(BaseStrategy):
             vol_ratio = vol / avg_vol
             return self.build_alert(
                 tag=tag,
-                title=f"🔻 {tag} 放量下跌 -{drop_pct*100:.2f}%",
+                title=f"{_fire(drop_pct)} {tag} 放量下跌 -{drop_pct*100:.2f}%",
                 fields=[
                     f"**当前价格**\n{close_p:.6f} USDT",
                     f"**K线最低**\n{low_p:.6f} USDT",

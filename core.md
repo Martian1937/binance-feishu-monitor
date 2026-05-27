@@ -72,7 +72,7 @@ strategies/
 
 ```
 均值 = 过去 VOLUME_WINDOW（10）根已闭合 K 线成交量均值
-倍数 = 当前K线成交量 / 均值  ≥  VOLUME_MULTIPLIER（1.5x）
+倍数 = 当前K线成交量 / 均值  ≥  VOLUME_MULTIPLIER（2x）
 ```
 
 拉升必须带量才有持续性。均值只统计已闭合 K 线（`close ≠ open`）。
