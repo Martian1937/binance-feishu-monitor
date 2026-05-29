@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from config import THRESHOLD, VOLUME_WINDOW, VOLUME_MULTIPLIER
+from config import THRESHOLD, ALERT_COOLDOWN, VOLUME_WINDOW, VOLUME_MULTIPLIER
 from .base import BaseStrategy
 
 
@@ -19,7 +19,7 @@ def _avg_volume(klines, n):
 
 class SurgeStrategy(BaseStrategy):
     name = "surge"
-    cooldown = 300
+    cooldown = ALERT_COOLDOWN
 
     def init_state(self):
         return {"last_alert": 0}

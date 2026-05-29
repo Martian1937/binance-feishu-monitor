@@ -1,12 +1,13 @@
 # binance-feishu-monitor
 
-监控 Binance U 本位永续合约 K 线，捕捉瞬间拉升 + 趋势上涨 + 成交量异常，通过飞书机器人推送告警。
+监控 Binance U 本位永续合约 K 线，捕捉放量拉升 / 放量下跌，通过飞书机器人推送告警。
 
 ## 功能
 
-- **1 分钟 K 线**，30 秒轮询，快速发现异动
-- **三维告警**：单 K 线拉升 / 多 K 线趋势 / 成交量放大
-- **同方向冷却**，避免刷屏
+- **15 分钟 K 线**，60 秒轮询
+- **Top 涨幅榜自动更新**：启动和定时刷新 Binance U 本位涨幅榜 Top50，并与手动币种合并
+- **组合告警**：单 K 线涨跌幅 / 成交量放大 / 前一根 K 线方向
+- **告警冷却**，避免刷屏
 - **飞书卡片消息**，不同颜色区分告警类型
 
 ## 使用
@@ -22,15 +23,16 @@ LARK_WEBHOOK="https://..." python3 main.py
 
 | 变量 | 说明 | 默认值 |
 |---|---|---|
-| `SYMBOLS` | 监控币种列表 (小写+usdt) | `["vvvusdt", "labusdt", ...]` |
-| `INTERVAL` | K 线周期 | `1m` |
-| `THRESHOLD` | 单 K 线拉升阈值 | 0.02 (2%) |
-| `CHECK_INTERVAL` | 轮询间隔 (秒) | 30 |
-| `ALERT_COOLDOWN` | 同方向告警冷却 (秒) | 120 |
-| `TREND_KLINES` | 趋势判断 K 线数量 | 5 |
-| `TREND_THRESHOLD` | 趋势累计涨幅阈值 | 0.04 (4%) |
+| `SYMBOLS` | 运行时合并后的完整监控币种列表 | `["vvvusdt", "labusdt", ...]` |
+| `MANUAL_SYMBOLS` | 手动固定监控币种列表 | `["vvvusdt", "labusdt", ...]` |
+| `INTERVAL` | K 线周期 | `15m` |
+| `THRESHOLD` | 单 K 线涨跌幅阈值 | 0.03 (3%) |
+| `CHECK_INTERVAL` | 轮询间隔 (秒) | 60 |
+| `ALERT_COOLDOWN` | 告警冷却 (秒) | 300 |
 | `VOLUME_WINDOW` | 成交量均值窗口 | 10 |
 | `VOLUME_MULTIPLIER` | 成交量放大倍数 | 2.0 |
+| `TOP_N` | 涨幅榜取前 N 个币种 | 50 |
+| `REFRESH_INTERVAL` | 涨幅榜刷新间隔 (秒) | 1800 |
 | `LARK_WEBHOOK` | 飞书机器人 Webhook | — |
 
 ## 项目结构
@@ -43,10 +45,26 @@ binance-feishu-monitor/
 ├── api.py          # Binance REST API
 ├── monitor.py      # 调度引擎 (K线 + 多策略)
 ├── main.py         # 入口
+├── main_ma.py      # BTC/ETH 均线摆正监控入口
 └── strategies/     # 策略目录
     ├── __init__.py # 策略注册
     ├── base.py     # 基类
-    └── surge.py    # 放量拉升 + 放量下跌
+    ├── surge.py    # 放量拉升 + 放量下跌
+    ├── trend.py    # EMA20 / MA20 趋势策略（未注册）
+    └── ma_alignment.py # main_ma.py 使用的均线场景逻辑
 ```
 
- source ~/.zshrc && nohup python3 main.py > py-script.log 2>&1 
+## 后台运行
+
+```bash
+source ~/.zshrc
+nohup python3 main.py > py-script.log 2>&1 &
+```
+
+## 均线监控入口
+
+`main_ma.py` 是独立入口，监控 BTC/ETH 的 15 分钟和 1 小时均线场景，使用单独的环境变量：
+
+```bash
+LARK_WEBHOOK_MA="https://..." python3 main_ma.py
+```
