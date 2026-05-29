@@ -15,6 +15,7 @@ LARK_WEBHOOK = os.environ.get("LARK_WEBHOOK") or ""
 
 - `config.py` 里留空，放心提交到仓库
 - 实际值通过环境变量传入，不会泄露
+- 环境变量名称可以参考 `.env.example`
 
 ### 配置方式
 
@@ -26,6 +27,13 @@ echo 'export LARK_WEBHOOK="https://your-webhook-url"' >> ~/.zshrc
 
 # bash
 echo 'export LARK_WEBHOOK="https://your-webhook-url"' >> ~/.bash_profile
+```
+
+`main_ma.py` 使用单独的飞书 Webhook：
+
+```bash
+export LARK_WEBHOOK_MA="https://your-webhook-url"
+export EMAIL_MA="you@example.com"
 ```
 
 ### 运行

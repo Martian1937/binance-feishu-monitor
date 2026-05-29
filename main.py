@@ -25,7 +25,8 @@ def run():
     init_states()
     send_lark("🟢 监控已启动", [
         f"**监控币种**\n{len(merged)} 个 (Top{TOP_N}涨幅 + 配置)",
-        f"**触发条件**\n拉升{config.THRESHOLD*100:.0f}% + 量能{config.VOLUME_MULTIPLIER:.1f}x + 连续阳线",
+        f"**触发条件**\n涨跌{config.THRESHOLD*100:.0f}% + 量能{config.VOLUME_MULTIPLIER:.1f}x + 前K方向",
+        f"**K线周期**\n{config.INTERVAL}",
         f"**检查间隔**\n{config.CHECK_INTERVAL}秒",
     ], template="green")
     log("=" * 50)

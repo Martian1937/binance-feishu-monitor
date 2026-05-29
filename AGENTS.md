@@ -9,14 +9,18 @@ python3 main.py
 ## 依赖
 
 ```bash
-pip install requests
+pip install -r requirements.txt
 ```
+
+环境变量示例见 `.env.example`，真实 Webhook 不要写入仓库。
 
 ## 项目结构
 
 ```
 binance-feishu-monitor/
 ├── config.py          # 配置常量 (币种、阈值、Webhook 等)
+├── requirements.txt   # Python 依赖
+├── .env.example       # 环境变量示例（不含真实密钥）
 ├── util.py            # 通用工具 (log)
 ├── lark.py            # 飞书机器人卡片消息推送
 ├── api.py             # Binance REST API K线和涨幅榜获取
@@ -57,3 +61,17 @@ binance-feishu-monitor/
 - 需要外网访问 `fapi.binance.com`
 - 告警有冷却期，避免刷屏
 - `main_ma.py` 使用 `LARK_WEBHOOK_MA`，与主入口 `LARK_WEBHOOK` 分开配置
+
+## 验证
+
+无测试框架。修改后至少运行：
+
+```bash
+python3 -m py_compile main.py main_ma.py api.py lark.py monitor.py util.py config.py strategies/base.py strategies/surge.py strategies/trend.py strategies/ma_alignment.py strategies/__init__.py
+```
+
+## 文件状态说明
+
+- `PLAN.md` 是历史优化方案，不代表当前运行参数。
+- `core.md` 记录当前主监控核心算法。
+- `strategies/trend.py` 当前未在 `strategies/__init__.py` 注册，主入口不会执行。

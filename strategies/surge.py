@@ -1,6 +1,12 @@
 from datetime import datetime
 
-from config import THRESHOLD, ALERT_COOLDOWN, VOLUME_WINDOW, VOLUME_MULTIPLIER
+from config import (
+    INTERVAL,
+    THRESHOLD,
+    ALERT_COOLDOWN,
+    VOLUME_WINDOW,
+    VOLUME_MULTIPLIER,
+)
 from .base import BaseStrategy
 
 
@@ -68,7 +74,7 @@ class SurgeStrategy(BaseStrategy):
                     f"**成交量**\n{vol:.0f}（{vol_ratio:.1f}倍均值）",
                     f"**连续阳线**\n{len(klines) - 2}根+（含本根）",
                     f"**检测时间**\n{datetime.now().strftime('%H:%M:%S')}",
-                    f"**K线周期**\n15分钟",
+                    f"**K线周期**\n{INTERVAL}",
                 ],
                 template="orange",
             )
@@ -85,7 +91,7 @@ class SurgeStrategy(BaseStrategy):
                 f"**成交量**\n{vol:.0f}（{vol_ratio:.1f}倍均值）",
                 f"**连续阴线**\n{len(klines) - 2}根+（含本根）",
                 f"**检测时间**\n{datetime.now().strftime('%H:%M:%S')}",
-                f"**K线周期**\n15分钟",
+                f"**K线周期**\n{INTERVAL}",
             ],
             template="purple",
         )
