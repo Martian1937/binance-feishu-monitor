@@ -46,12 +46,13 @@ binance-feishu-monitor/
 - `CHECK_INTERVAL` — 定时检查间隔秒数 (默认 60)
 - `ALERT_COOLDOWN` — 告警冷却秒数 (默认 300)
 - `TOP_N` — 涨幅榜取前 N 个币种 (默认 50)
+- `ENABLE_TOP_GAINERS` — 是否从接口获取涨幅榜 TopN 并合并监控 (默认 `False`)
 - `REFRESH_INTERVAL` — 涨幅榜刷新间隔秒数 (默认 1800)
 
 ## 架构
 
-- 启动时 REST API 获取涨幅榜 TopN，与 `MANUAL_SYMBOLS` 合并后初始化 K 线并推送飞书消息
-- 后台线程每 `CHECK_INTERVAL` 秒轮询币安 API，并每 `REFRESH_INTERVAL` 秒刷新涨幅榜
+- 启动时根据 `ENABLE_TOP_GAINERS` 决定是否 REST API 获取涨幅榜 TopN，再与 `MANUAL_SYMBOLS` 合并后初始化 K 线并推送飞书消息
+- 后台线程每 `CHECK_INTERVAL` 秒轮询币安 API；开启 `ENABLE_TOP_GAINERS` 后每 `REFRESH_INTERVAL` 秒刷新涨幅榜
 - 当前主入口只注册 `SurgeStrategy`，检测放量拉升 / 放量下跌
 - 飞书消息使用卡片消息格式 (`interactive`)
 - 无框架、无测试、无 lint/typecheck 配置

@@ -67,11 +67,15 @@ def check_price():
 
 
 def refresh_symbols():
-    from config import SYMBOLS, MANUAL_SYMBOLS, TOP_N
-    from api import fetch_top_gainers
-    top = fetch_top_gainers(TOP_N)
-    if not top:
-        return
+    from config import ENABLE_TOP_GAINERS, SYMBOLS, MANUAL_SYMBOLS, TOP_N
+
+    top = []
+    if ENABLE_TOP_GAINERS:
+        from api import fetch_top_gainers
+
+        top = fetch_top_gainers(TOP_N)
+        if not top:
+            return
     merged = list(set(top + MANUAL_SYMBOLS))
     merged.sort()
     SYMBOLS[:] = merged
@@ -86,7 +90,10 @@ def refresh_symbols():
         stale = [sym for sym in list(states) if sym not in SYMBOLS]
         for sym in stale:
             del states[sym]
-    log(f"涨幅榜已刷新: {len(SYMBOLS)} 个币种")
+    if ENABLE_TOP_GAINERS:
+        log(f"涨幅榜已刷新: {len(SYMBOLS)} 个币种")
+    else:
+        log(f"手动监控币种已同步: {len(SYMBOLS)} 个币种")
 
 
 def timer_loop():

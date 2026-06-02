@@ -25,8 +25,8 @@ LARK_WEBHOOK="https://..." python3 main.py
 
 | 变量 | 说明 | 默认值 |
 |---|---|---|
-| `SYMBOLS` | 运行时合并后的完整监控币种列表 | `["vvvusdt", "labusdt", ...]` |
-| `MANUAL_SYMBOLS` | 手动固定监控币种列表 | `["vvvusdt", "labusdt", ...]` |
+| `SYMBOLS` | 运行时合并后的完整监控币种列表 | `["labusdt"]` |
+| `MANUAL_SYMBOLS` | 手动固定监控币种列表 | `["labusdt"]` |
 | `INTERVAL` | K 线周期 | `15m` |
 | `THRESHOLD` | 单 K 线涨跌幅阈值 | 0.03 (3%) |
 | `CHECK_INTERVAL` | 轮询间隔 (秒) | 60 |
@@ -34,6 +34,7 @@ LARK_WEBHOOK="https://..." python3 main.py
 | `VOLUME_WINDOW` | 成交量均值窗口 | 10 |
 | `VOLUME_MULTIPLIER` | 成交量放大倍数 | 2.0 |
 | `TOP_N` | 涨幅榜取前 N 个币种 | 50 |
+| `ENABLE_TOP_GAINERS` | 是否从接口获取涨幅榜 TopN 并合并监控 | False |
 | `REFRESH_INTERVAL` | 涨幅榜刷新间隔 (秒) | 1800 |
 | `LARK_WEBHOOK` | 飞书机器人 Webhook | — |
 
