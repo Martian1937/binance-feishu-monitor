@@ -1,7 +1,7 @@
 import os
 
-SYMBOLS = ["labusdt"]                                      # 运行时合并后的完整列表（会自动更新）
-MANUAL_SYMBOLS = ["labusdt"]                               # 手动监控的币种（不会被覆盖）
+SYMBOLS = ["dexeusdt"]                                      # 运行时合并后的完整列表（会自动更新）
+MANUAL_SYMBOLS = ["dexeusdt"]                               # 手动监控的币种（不会被覆盖）
 INTERVAL = "15m"                                         # K线周期：1m / 3m / 5m / 15m 等
 THRESHOLD = 0.05                                       # 单K线涨跌幅阈值（3%）
 CHECK_INTERVAL = 60                                      # API 轮询间隔（秒）

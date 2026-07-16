@@ -97,12 +97,12 @@ def refresh_symbols():
 
 
 def timer_loop():
-    from config import CHECK_INTERVAL, REFRESH_INTERVAL
+    from config import CHECK_INTERVAL, ENABLE_TOP_GAINERS, REFRESH_INTERVAL
     last_refresh = 0
     while True:
         time.sleep(CHECK_INTERVAL)
         now = time.time()
-        if now - last_refresh >= REFRESH_INTERVAL:
+        if ENABLE_TOP_GAINERS and now - last_refresh >= REFRESH_INTERVAL:
             refresh_symbols()
             last_refresh = now
         try:
