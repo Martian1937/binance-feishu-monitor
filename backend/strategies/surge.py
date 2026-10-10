@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from config import (
+from common.config import (
     INTERVAL,
     THRESHOLD,
     ALERT_COOLDOWN,

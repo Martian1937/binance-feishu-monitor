@@ -29,7 +29,7 @@ echo 'export LARK_WEBHOOK="https://your-webhook-url"' >> ~/.zshrc
 echo 'export LARK_WEBHOOK="https://your-webhook-url"' >> ~/.bash_profile
 ```
 
-`main_ma.py` 使用单独的飞书 Webhook：
+`backend/ma/main.py` 使用单独的飞书 Webhook：
 
 ```bash
 export LARK_WEBHOOK_MA="https://your-webhook-url"
@@ -40,10 +40,10 @@ export EMAIL_MA="you@example.com"
 
 ```bash
 # 方式一：新开终端直接运行（shell 配置自动生效）
-python3 main.py
+python3 backend/surge/main.py
 
 # 方式二：手动传（临时覆盖）
-LARK_WEBHOOK="https://your-url" python3 main.py
+LARK_WEBHOOK="https://your-url" python3 backend/surge/main.py
 ```
 
 ### 注意事项

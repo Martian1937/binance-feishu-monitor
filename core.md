@@ -15,10 +15,10 @@ Binance Futures API (fapi)
 
 ## 策略架构
 
-策略放在 `strategies/` 文件夹下，每个策略一个文件，继承 `BaseStrategy`。
+策略放在 `backend/strategies/` 文件夹下，每个策略一个文件，继承 `BaseStrategy`。
 
 ```
-strategies/
+backend/strategies/
 ├── __init__.py    # 注册所有策略
 ├── base.py        # BaseStrategy 基类
 ├── surge.py       # 📈 放量拉升 + 📉 放量下跌

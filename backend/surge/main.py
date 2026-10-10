@@ -1,18 +1,23 @@
+import os
+import sys
 import time
 import threading
 
-from util import log
+# 让 backend/ 下的 common / strategies 可被导入
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from common.util import log
 
 
 def run():
-    from config import ENABLE_TOP_GAINERS, MANUAL_SYMBOLS, TOP_N
+    from common.config import ENABLE_TOP_GAINERS, MANUAL_SYMBOLS, TOP_N
 
-    import config
+    import common.config as config
 
     top = []
     source_label = "手动配置"
     if ENABLE_TOP_GAINERS:
-        from api import fetch_top_gainers
+        from common.api import fetch_top_gainers
 
         top = fetch_top_gainers(TOP_N)
         log(f"涨幅榜 Top{TOP_N}: {', '.join(top)}")
@@ -25,9 +30,9 @@ def run():
     config.SYMBOLS.clear()
     config.SYMBOLS.extend(merged)
 
-    from monitor import init_states, timer_loop
+    from surge.monitor import init_states, timer_loop
 
-    from lark import send_lark
+    from common.lark import send_lark
 
     init_states()
     send_lark("🟢 监控已启动", [

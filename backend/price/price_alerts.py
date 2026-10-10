@@ -6,9 +6,9 @@ from datetime import datetime
 
 import requests
 
-from config import LARK_WEBHOOK
-from lark import send_lark
-from util import log
+from common.config import LARK_WEBHOOK
+from common.lark import send_lark
+from common.util import log
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

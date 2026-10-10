@@ -1,10 +1,10 @@
 import time
 import threading
 
-from config import SYMBOLS
-from api import fetch_kline, fetch_klines
-from lark import send_lark
-from util import log
+from common.config import SYMBOLS
+from common.api import fetch_kline, fetch_klines
+from common.lark import send_lark
+from common.util import log
 from strategies import STRATEGIES
 
 
@@ -67,11 +67,11 @@ def check_price():
 
 
 def refresh_symbols():
-    from config import ENABLE_TOP_GAINERS, SYMBOLS, MANUAL_SYMBOLS, TOP_N
+    from common.config import ENABLE_TOP_GAINERS, SYMBOLS, MANUAL_SYMBOLS, TOP_N
 
     top = []
     if ENABLE_TOP_GAINERS:
-        from api import fetch_top_gainers
+        from common.api import fetch_top_gainers
 
         top = fetch_top_gainers(TOP_N)
         if not top:
@@ -97,7 +97,7 @@ def refresh_symbols():
 
 
 def timer_loop():
-    from config import CHECK_INTERVAL, ENABLE_TOP_GAINERS, REFRESH_INTERVAL
+    from common.config import CHECK_INTERVAL, ENABLE_TOP_GAINERS, REFRESH_INTERVAL
     last_refresh = 0
     while True:
         time.sleep(CHECK_INTERVAL)

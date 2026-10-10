@@ -1,11 +1,14 @@
 import json
 import os
+import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from lark import send_lark
-from util import log
-from price_alerts import (
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from common.lark import send_lark
+from common.util import log
+from price.price_alerts import (
     PRICE_ALERT_COOLDOWN,
     PRICE_POLL_INTERVAL,
     PRICE_SERVER_HOST,
@@ -16,9 +19,6 @@ from price_alerts import (
     normalize_symbol,
     poll_loop,
 )
-
-
-HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "price_alerts.html")
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -36,20 +36,6 @@ class Handler(BaseHTTPRequestHandler):
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
-        self._cors()
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
-
-    def _send_html(self):
-        try:
-            with open(HTML_FILE, "rb") as f:
-                body = f.read()
-        except FileNotFoundError:
-            self._send_json({"error": "page not found"}, 404)
-            return
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
         self._cors()
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -75,8 +61,6 @@ class Handler(BaseHTTPRequestHandler):
                 ],
                 "source": PRICE_SOURCE,
             })
-        elif self.path == "/legacy":
-            self._send_html()
         else:
             self._send_json({"error": "not found"}, 404)
 

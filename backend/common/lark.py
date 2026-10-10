@@ -1,6 +1,6 @@
 import requests
-from config import LARK_WEBHOOK
-from util import log
+from common.config import LARK_WEBHOOK
+from common.util import log
 
 
 def send_lark(title, content_lines, template="red", webhook=None):

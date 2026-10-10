@@ -1,10 +1,13 @@
 import os
+import sys
 import time
 import threading
 
-from util import log
-from api import fetch_kline, fetch_klines
-from lark import send_lark
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from common.util import log
+from common.api import fetch_kline, fetch_klines
+from common.lark import send_lark
 from strategies.ma_alignment import (
     check_alignment,
     check_ema_above_sma,

@@ -1,6 +1,6 @@
 import requests
-from config import REST_URL, INTERVAL
-from util import log
+from common.config import REST_URL, INTERVAL
+from common.util import log
 
 
 def _parse_kline(k):
