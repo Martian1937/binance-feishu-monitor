@@ -1,0 +1,203 @@
+@bg: #f4f5f7;
+@card: #ffffff;
+@line: #e4e6ea;
+@text: #1f2329;
+@muted: #7a828e;
+@brand: #2563eb;
+@brand-dark: #1d4ed8;
+@danger: #dc2626;
+@radius: 12px;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
+  background: @bg;
+  color: @text;
+}
+
+.wrap {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 28px 16px 72px;
+}
+
+h1 {
+  font-size: 22px;
+  margin: 0 0 6px;
+}
+
+.sub {
+  color: @muted;
+  font-size: 13px;
+  margin: 0 0 22px;
+}
+
+.bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  .sym-input {
+    width: 170px;
+  }
+
+  .levels-input {
+    flex: 1;
+    min-width: 220px;
+  }
+}
+
+input,
+button {
+  font: inherit;
+}
+
+input {
+  padding: 10px 12px;
+  border: 1px solid @line;
+  border-radius: 10px;
+  background: #fff;
+
+  &:focus {
+    outline: 2px solid @brand;
+    border-color: transparent;
+  }
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  background: @brand;
+  color: #fff;
+
+  &:hover {
+    background: @brand-dark;
+  }
+}
+
+button.danger {
+  background: transparent;
+  color: @danger;
+  border: 1px solid @danger;
+}
+
+.card {
+  background: @card;
+  border: 1px solid @line;
+  border-radius: @radius;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.sym {
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 13px;
+  color: @muted;
+  cursor: pointer;
+  user-select: none;
+
+  input {
+    width: 16px;
+    height: 16px;
+    accent-color: @brand;
+  }
+}
+
+.price {
+  color: @muted;
+  font-size: 14px;
+  margin-bottom: 4px;
+
+  b {
+    color: @text;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 14px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border: 1px solid @line;
+  border-radius: 999px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+
+  button {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: @danger;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+
+    &:hover {
+      background: none;
+    }
+  }
+}
+
+.add-level {
+  display: flex;
+  gap: 8px;
+
+  input {
+    width: 170px;
+    padding: 8px 10px;
+  }
+
+  button {
+    padding: 8px 14px;
+  }
+}
+
+.empty {
+  color: @muted;
+  font-size: 14px;
+  padding: 24px;
+  text-align: center;
+  border: 1px dashed @line;
+  border-radius: @radius;
+}
+
+.hint {
+  color: @muted;
+  font-size: 12px;
+}
+
+.status {
+  color: @muted;
+  font-size: 12px;
+  margin-top: 16px;
+}

@@ -6,6 +6,12 @@
 python3 main.py
 ```
 
+点位提醒（网页 + 轮询）：
+
+```bash
+python3 main_price.py
+```
+
 ## 依赖
 
 ```bash
@@ -27,6 +33,10 @@ binance-feishu-monitor/
 ├── monitor.py         # K线状态维护、策略调度、定时器
 ├── main.py            # 主入口 (Top涨幅 + 手动币种监控)
 ├── main_ma.py         # 独立入口 (BTC/ETH 均线摆正监控)
+├── main_price.py      # 独立入口 (点位提醒网页 + 轮询)
+├── price_alerts.py    # 点位提醒核心 (价格源/配置存储/突破检测)
+├── price_alerts.html  # 点位提醒前端页面 (单文件)
+├── price_alerts.json  # 点位提醒本地配置 (已 gitignore)
 └── strategies/        # 策略模块
     ├── base.py        # 策略基类
     ├── surge.py       # 放量拉升 + 放量下跌
@@ -60,15 +70,17 @@ binance-feishu-monitor/
 ## 注意事项
 
 - 需要外网访问 `fapi.binance.com`
+- 点位提醒默认使用 `data-api.binance.vision`（币安公共行情域名），在部分网络下比 `api.binance.com` 更稳定
 - 告警有冷却期，避免刷屏
 - `main_ma.py` 使用 `LARK_WEBHOOK_MA`，与主入口 `LARK_WEBHOOK` 分开配置
+- `main_price.py` 使用 `LARK_WEBHOOK_PRICE`，未配置时回退到 `LARK_WEBHOOK`
 
 ## 验证
 
 无测试框架。修改后至少运行：
 
 ```bash
-python3 -m py_compile main.py main_ma.py api.py lark.py monitor.py util.py config.py strategies/base.py strategies/surge.py strategies/trend.py strategies/ma_alignment.py strategies/__init__.py
+python3 -m py_compile main.py main_ma.py main_price.py price_alerts.py api.py lark.py monitor.py util.py config.py strategies/base.py strategies/surge.py strategies/trend.py strategies/ma_alignment.py strategies/__init__.py
 ```
 
 ## 文件状态说明

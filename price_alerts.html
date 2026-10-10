@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>点位提醒</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --line:#e4e6ea; --text:#1f2329;
+    --muted:#7a828e; --brand:#2563eb; --brand-dark:#1d4ed8;
+    --danger:#dc2626; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+  .wrap{max-width:840px;margin:0 auto;padding:28px 16px 72px}
+  h1{font-size:22px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 22px}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+  input,button{font:inherit}
+  input{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  input:focus{outline:2px solid var(--brand);outline-offset:0;border-color:transparent}
+  #new-symbol{width:170px}
+  #new-levels{flex:1;min-width:220px}
+  button{border:0;border-radius:10px;padding:10px 16px;cursor:pointer;background:var(--brand);color:#fff}
+  button:hover{background:var(--brand-dark)}
+  button.ghost{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+  button.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+  .card-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .sym{font-weight:700;font-size:17px}
+  .switch{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+  .switch input{width:16px;height:16px;accent-color:var(--brand)}
+  .price{color:var(--muted);font-size:14px;margin-bottom:4px}
+  .price b{color:var(--text);font-variant-numeric:tabular-nums}
+  .levels{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px}
+  .chip{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;font-size:14px;font-variant-numeric:tabular-nums}
+  .chip button{background:none;border:0;padding:0;color:var(--danger);cursor:pointer;font-size:15px;line-height:1}
+  .chip button:hover{background:none}
+  .add-level{display:flex;gap:8px}
+  .add-level input{width:170px;padding:8px 10px}
+  .add-level button{padding:8px 14px}
+  .empty{color:var(--muted);font-size:14px;padding:24px;text-align:center;border:1px dashed var(--line);border-radius:var(--radius)}
+  .hint{color:var(--muted);font-size:12px;margin-top:8px}
+  .status{color:var(--muted);font-size:12px;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎯 点位提醒</h1>
+  <p class="sub">设置币种与多个目标价位，价格向上突破或向下跌破时推送飞书卡片，提醒有冷却避免刷屏。</p>
+
+  <div class="bar">
+    <input id="new-symbol" placeholder="币种，如 PYTH / ASTER">
+    <input id="new-levels" placeholder="价位，逗号或空格分隔，如 0.88 1 1.25">
+    <button id="add-btn">添加监控</button>
+  </div>
+
+  <div id="list"></div>
+  <div class="status" id="status">加载中…</div>
+</div>
+
+<script>
+  const API = '/api/alerts';
+  const list = document.getElementById('list');
+  const statusEl = document.getElementById('status');
+  let cache = '';
+
+  function normSymbol(raw){
+    let s = (raw || '').toUpperCase().replace(/[\s\/\-\_]/g, '');
+    if(!s.endsWith('USDT')) s += 'USDT';
+    return s;
+  }
+
+  function parseLevels(raw){
+    const seen = new Set();
+    const out = [];
+    for(const t of (raw || '').split(/[,\s]+/)){
+      if(!t) continue;
+      const n = Number(t);
+      if(Number.isFinite(n) && n > 0 && !seen.has(n)){ seen.add(n); out.push(n); }
+    }
+    return out.sort((a,b) => a-b);
+  }
+
+  function fmt(p){
+    if(p === null || p === undefined) return '—';
+    if(p >= 1000) return p.toFixed(2);
+    if(p >= 1) return p.toFixed(4);
+    return p.toFixed(6);
+  }
+
+  async function call(method, url, body){
+    const opt = {method, headers:{'Content-Type':'application/json'}};
+    if(body !== undefined) opt.body = JSON.stringify(body);
+    const r = await fetch(url, opt);
+    return r.json();
+  }
+
+  function render(alerts){
+    list.innerHTML = '';
+    if(!alerts.length){
+      list.innerHTML = '<div class="empty">还没有监控项，先在上方添加币种和价位。</div>';
+      return;
+    }
+    for(const a of alerts) renderCard(a);
+  }
+
+  function renderCard(a){
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.symbol = a.symbol;
+
+    const head = document.createElement('div');
+    head.className = 'card-head';
+    const sym = document.createElement('span');
+    sym.className = 'sym';
+    sym.textContent = a.symbol;
+
+    const sw = document.createElement('label');
+    sw.className = 'switch';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = !!a.enabled;
+    cb.addEventListener('change', async () => {
+      await call('POST', API, {symbol:a.symbol, levels:a.levels, enabled:cb.checked});
+      refresh();
+    });
+    sw.append(cb, '启用');
+
+    const del = document.createElement('button');
+    del.className = 'danger';
+    del.textContent = '删除';
+    del.addEventListener('click', async () => {
+      if(confirm('删除 ' + a.symbol + ' 的所有提醒？')){
+        await call('DELETE', API + '/' + encodeURIComponent(a.symbol));
+        refresh();
+      }
+    });
+
+    head.append(sym, sw, del);
+
+    const price = document.createElement('div');
+    price.className = 'price';
+    price.innerHTML = '当前价格 <b class="live" data-symbol="' + a.symbol + '">' + fmt(a.last_price) + '</b> USDT';
+
+    const levels = document.createElement('div');
+    levels.className = 'levels';
+    for(const lv of a.levels){
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      const val = document.createElement('span');
+      val.textContent = lv;
+      const x = document.createElement('button');
+      x.textContent = '×';
+      x.title = '删除该价位';
+      x.addEventListener('click', async () => {
+        const nl = a.levels.filter(v => v !== lv);
+        await call('POST', API, {symbol:a.symbol, levels:nl, enabled:a.enabled});
+        refresh();
+      });
+      chip.append(val, x);
+      levels.appendChild(chip);
+    }
+    if(!a.levels.length){
+      const h = document.createElement('span');
+      h.className = 'hint';
+      h.textContent = '还没有价位，下方添加';
+      levels.appendChild(h);
+    }
+
+    const addLv = document.createElement('div');
+    addLv.className = 'add-level';
+    const inp = document.createElement('input');
+    inp.placeholder = '新价位，如 1.25';
+    const btn = document.createElement('button');
+    btn.textContent = '加价位';
+    btn.addEventListener('click', async () => {
+      const nl = parseLevels(inp.value);
+      if(!nl.length) return;
+      const merged = [...a.levels, ...nl].sort((x,y) => x-y);
+      await call('POST', API, {symbol:a.symbol, levels:merged, enabled:a.enabled});
+      refresh();
+    });
+    addLv.append(inp, btn);
+
+    card.append(head, price, levels, addLv);
+    list.appendChild(card);
+  }
+
+  function updatePrices(alerts){
+    for(const a of alerts){
+      const el = list.querySelector('.live[data-symbol="' + a.symbol + '"]');
+      if(el) el.textContent = fmt(a.last_price);
+    }
+  }
+
+  async function refresh(){
+    try{
+      const data = await call('GET', API);
+      const alerts = data.alerts || [];
+      const sig = alerts.map(a => a.symbol + '|' + a.levels.join(',') + '|' + a.enabled).join(';');
+      if(sig !== cache){ cache = sig; render(alerts); }
+      else updatePrices(alerts);
+      statusEl.textContent = '数据源 ' + (data.source || '—') + ' · 最后刷新 ' + new Date().toLocaleTimeString();
+    }catch(e){
+      statusEl.textContent = '刷新失败：' + e;
+    }
+  }
+
+  document.getElementById('add-btn').addEventListener('click', async () => {
+    const sym = normSymbol(document.getElementById('new-symbol').value);
+    if(!sym){ alert('请输入币种'); return; }
+    const levels = parseLevels(document.getElementById('new-levels').value);
+    await call('POST', API, {symbol:sym, levels:levels, enabled:true});
+    document.getElementById('new-symbol').value = '';
+    document.getElementById('new-levels').value = '';
+    refresh();
+  });
+
+  refresh();
+  setInterval(refresh, 5000);
+</script>
+</body>
+</html>
